@@ -39,6 +39,19 @@ classdef RigidBodyCapsule < RigidBodyGeometry
       
       pts = obj.T(1:end-1,:)*[cx;cy;cz;ones(1,2)];
     end
+    
+    function pts = getTerrainContactPoints(obj)
+      % Return a discrete set of contact points along the endpoints of the
+      % capsule, all at radial distance
+      n = 36;
+      angles = linspace(0,2*pi,n+1);
+      angles = angles(1:n);
+      angles = horzcat(angles, angles);
+      zs = horzcat(obj.len/2 * ones(1, n), -obj.len/2 * ones(1,n));
+      [x,y,z] = pol2cart(angles, obj.radius * ones(1,2*n), zs);
+      pts = obj.T(1:3,:) * [x;y;z;ones(1,2*n)];
+      %pts = [x;y;z];
+    end
 
     function pts = getBoundingBoxPoints(obj)
       cx = obj.radius*[-1 1 1 -1 -1 1 1 -1];
