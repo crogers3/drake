@@ -39,6 +39,14 @@ classdef RigidBodyCapsule < RigidBodyGeometry
       
       pts = obj.T(1:end-1,:)*[cx;cy;cz;ones(1,2)];
     end
+    
+    function pts = getTerrainContactPoints(obj)
+        pts = getPoints(obj);
+    end
+    
+    function rads = getTerrainContactPointRadii(obj)
+        rads = obj.radius * ones(1,size(getPoints(obj),2));
+    end
 
     function pts = getBoundingBoxPoints(obj)
       cx = obj.radius*[-1 1 1 -1 -1 1 1 -1];

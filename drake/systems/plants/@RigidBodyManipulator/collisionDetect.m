@@ -136,7 +136,8 @@ if ~isempty(obj.terrain) && ...
 
   if ~isempty(terrain_contact_point_struct)
     
-    xA_new = [terrain_contact_point_struct.pts];
+    xA_new = [];
+    radii = [terrain_contact_point_struct.radii];
     numStructs = size(terrain_contact_point_struct,2);
 
     %total_pts = size(horzcat(terrain_contact_point_struct.pts),2); %too slow
@@ -144,17 +145,21 @@ if ~isempty(obj.terrain) && ...
     k = 1;
     for i = 1:numStructs
         numPts = size(terrain_contact_point_struct(i).pts,2);
-        xA_new_in_world = [xA_new_in_world, forwardKin(obj, kinsol, ...
-        terrain_contact_point_struct(i).idx, terrain_contact_point_struct(i).pts)];
+        xA_this_struct_in_world = forwardKin(obj, kinsol, ...
+        terrain_contact_point_struct(i).idx, terrain_contact_point_struct(i).pts);
+        xA_this_struct_in_world = [xA_this_struct_in_world(1:2,:);xA_this_struct_in_world(3,:)-radii(i)];
+        xA_this_struct_in_body = bodyKin(obj,kinsol,terrain_contact_point_struct(i).idx,xA_this_struct_in_world);
+        xA_new_in_world = [xA_new_in_world, xA_this_struct_in_world];
+        xA_new = [xA_new, xA_this_struct_in_body];
         for j = 1:numPts
             terrain_idxs(k) = terrain_contact_point_struct(i).idx;
             k = k+1;
         end
     end
-
+    
     % Note: only implements collisions with the obj.terrain so far
- [phi_new,normal_new,xB_new,idxB_new] = ...
-      collisionDetectTerrain(obj,xA_new_in_world);
+    [phi_new,normal_new,xB_new,idxB_new] = ...
+        collisionDetectTerrain(obj,xA_new_in_world);
 
     phi = [phi;phi_new];
     normal = [normal,normal_new];

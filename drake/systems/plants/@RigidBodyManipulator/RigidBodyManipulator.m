@@ -1222,6 +1222,8 @@ classdef RigidBodyManipulator < Manipulator
       %     * pts - 3xm array containing points on the body specified by
       %             idx (in body frame) that can collide with arbitrary
       %             terrain.
+      %     * radii - 1xm array containing radii of each contact point that
+      %             must be respected when colliding with arbitrary terrain
       %
       % See also RigidBodyGeometry/getTerrainContactPoints,
       % RigidBodyManipulator/terrainContactPositions
@@ -1243,7 +1245,7 @@ classdef RigidBodyManipulator < Manipulator
             sizecheck(contact_groups,size(body_idx));
           end
         end
-        terrain_contact_point_struct = struct('pts',{},'idx',{});
+        terrain_contact_point_struct = struct('pts',{},'idx',{},'radii',{});
         for i = 1:length(body_idx)
           bi=body_idx(i);
           if bi ~= 1
@@ -1252,8 +1254,12 @@ classdef RigidBodyManipulator < Manipulator
             else
               pts = getTerrainContactPoints(obj.body(bi),contact_groups{i});
             end
+            radii = getTerrainContactPointRadii(obj.body(bi));
+            if isempty(radii)
+              radii = zeros(1, size(pts, 2));
+            end
             if ~isempty(pts)
-              terrain_contact_point_struct(end+1) = struct('pts',pts,'idx',bi);
+              terrain_contact_point_struct(end+1) = struct('pts',pts,'idx',bi,'radii',radii);
             end
           end
         end

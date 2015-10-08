@@ -69,6 +69,10 @@ classdef RigidBodyGeometry < RigidBodyElement
       z = pts(3,:)';
       c = obj.c;
     end
+    
+    function radii = getTerrainContactPointRadii(obj)
+        radii = zeros(1, size(getTerrainContactPoints(obj), 2));
+    end
 
     function pts = getTerrainContactPoints(obj)
       % pts = getTerrainContactPoints(obj) returns the terrain contact points
