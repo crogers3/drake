@@ -427,6 +427,10 @@ if ~isempty(elnode)
   [model,fe] = RigidBodyPropellor.parseURDFNode(model,name,robotnum,elnode,options);
 end
 
+elnode = node.getElementsByTagName('magic_tire_road_interaction').item(0);
+if ~isempty(elnode)
+  [model,fe] = RigidBodyMagicTireRoadInteraction.parseURDFNode(model,name,robotnum,elnode,options);
+end
 
 
 if ~isempty(fe)
