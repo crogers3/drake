@@ -9,4 +9,3 @@ struct lcmt_driving_control_cmd_t
   double brake_value;
 }
 
-
