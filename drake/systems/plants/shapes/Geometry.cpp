@@ -291,4 +291,28 @@ namespace DrakeShapes
                    min_pos(2), max_pos(2), min_pos(2), max_pos(2), min_pos(2), max_pos(2), min_pos(2), max_pos(2);
   }
 
+  HeightMap::HeightMap(const string& filename)
+    : Geometry(HEIGHTMAP), filename(filename)
+  {}
+
+  bool HeightMap::extractHeights(Matrix3Xd& heights) const
+  {
+    runtime_error("not implemented yet");
+  }
+
+  HeightMap* HeightMap::clone() const
+  {
+    return new HeightMap(*this);
+  }
+
+  void HeightMap::getPoints(Matrix3Xd& point_matrix) const
+  {
+    runtime_error("not implemented yet");
+  }
+
+  void HeightMap::getBoundingBoxPoints(Matrix3Xd& bbox_points) const
+  {
+    runtime_error("not implemented yet");
+  }
+
 }

@@ -17,7 +17,8 @@ namespace DrakeShapes
     CYLINDER    = 3,
     MESH        = 4,
     MESH_POINTS = 5,
-    CAPSULE     = 6
+    CAPSULE     = 6,
+    HEIGHTMAP   = 7
   };
 
   const double MIN_RADIUS = 1e-7;
@@ -123,6 +124,18 @@ namespace DrakeShapes
       virtual void getBoundingBoxPoints(Eigen::Matrix3Xd &points) const;
 
       Eigen::Matrix3Xd points;
+  };
+
+  class DRAKESHAPES_EXPORT HeightMap : public Geometry {
+    public:
+      HeightMap(const std::string& filename);
+      virtual ~HeightMap() {}
+      virtual HeightMap* clone() const;
+      virtual void getPoints(Eigen::Matrix3Xd &points) const;
+      virtual void getBoundingBoxPoints(Eigen::Matrix3Xd &points) const;
+
+      std::string filename;
+      bool extractHeights(Eigen::Matrix3Xd& heights) const;
   };
 
 }
