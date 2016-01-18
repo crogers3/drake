@@ -4,11 +4,6 @@
 #include <vector>
 
 #include "NonlinearProgram.h"
-#include "LinearConstraint.h"
-#include "QuadraticConstraint.h"
-#include "FunctionHandleConstraint.h"
-#include "BoundingBoxConstraint.h"
-#include "ConstantConstraint.h"
 #include "Constraint.h"
 
 namespace snopt {
