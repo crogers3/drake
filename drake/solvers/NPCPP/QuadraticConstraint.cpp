@@ -1,21 +1,21 @@
 #include "QuadraticConstraint.h"
 
 namespace drake {
-QuadraticConstraint::QuadraticConstraint(snopt::doublereal lb,
-    snopt::doublereal ub,
-    snopt::integer xdim,
-    std::vector<std::pair<snopt::integer, snopt::doublereal>> Q_row,
-    std::vector<std::pair<snopt::integer, snopt::doublereal>> b_row,
-    std::vector<std::pair<snopt::integer, snopt::doublereal>> A_row) : Constraint(lb, ub, xdim) {
+QuadraticConstraint::QuadraticConstraint(double lb,
+    double ub,
+    int xdim,
+    std::vector<std::pair<int, double>> Q_row,
+    std::vector<std::pair<int, double>> b_row,
+    std::vector<std::pair<int, double>> A_row) : Constraint(lb, ub, xdim) {
   m_Q = Q_row;
   m_b = b_row;
   m_A = A_row;
 
   // Generate G
   std::vector<bool> varInQ(m_xdim, false);
-  std::vector<snopt::doublereal> varQval(m_xdim, 0.0);
+  std::vector<double> varQval(m_xdim, 0.0);
   std::vector<bool> varInB(m_xdim, false);
-  std::vector<snopt::doublereal> varBval(m_xdim, 0.0);
+  std::vector<double> varBval(m_xdim, 0.0);
   findIfVarInQAndB(&varInQ, &varInB);
   findVarQAndBVals(&varQval, &varBval);
   m_jGvar.clear();
@@ -26,15 +26,15 @@ QuadraticConstraint::QuadraticConstraint(snopt::doublereal lb,
   }
 }
 
-void QuadraticConstraint::nonlinearEval(snopt::doublereal x[],
+void QuadraticConstraint::nonlinearEval(double x[],
     bool needF,
     bool needG,
-    snopt::doublereal *f,
-    std::vector<snopt::doublereal> *g) const {
+    double *f,
+    std::vector<double> *g) const {
   std::vector<bool> varInQ(m_xdim, false);
-  std::vector<snopt::doublereal> varQval(m_xdim, 0.0);
+  std::vector<double> varQval(m_xdim, 0.0);
   std::vector<bool> varInB(m_xdim, false);
-  std::vector<snopt::doublereal> varBval(m_xdim, 0.0);
+  std::vector<double> varBval(m_xdim, 0.0);
   findIfVarInQAndB(&varInQ, &varInB);
   findVarQAndBVals(&varQval, &varBval);
   if (needF) {
@@ -52,7 +52,7 @@ void QuadraticConstraint::nonlinearEval(snopt::doublereal x[],
     g->clear();
     for (int i = 0; i < m_xdim; ++i) {
       if (varInQ[i] || varInB[i]) {
-        snopt::doublereal thisG = 0;
+        double thisG = 0;
         if (varInQ[i]) {
           thisG = thisG + (2 * varQval[i] * x[i]);
         }
@@ -66,27 +66,27 @@ void QuadraticConstraint::nonlinearEval(snopt::doublereal x[],
 }
 
 void QuadraticConstraint::findIfVarInQAndB(std::vector<bool>* varInQ, std::vector<bool>* varInB) const {
-  snopt::integer neQ = m_Q.size();
+  int neQ = m_Q.size();
   for (int i = 0; i < neQ; ++i) {
-    snopt::integer var_index = m_Q[i].first - 1;
+    int var_index = m_Q[i].first - 1;
     (*varInQ)[var_index] = true;
   }
-  snopt::integer neb = m_b.size();
+  int neb = m_b.size();
   for (int i = 0; i < neb; ++i) {
-    snopt::integer var_index = m_b[i].first - 1;
+    int var_index = m_b[i].first - 1;
     (*varInB)[var_index] = true;
   }
 }
 
-void QuadraticConstraint::findVarQAndBVals(std::vector<snopt::doublereal>* varQval, std::vector<snopt::doublereal>* varBval) const {
-  snopt::integer neQ = m_Q.size();
+void QuadraticConstraint::findVarQAndBVals(std::vector<double>* varQval, std::vector<double>* varBval) const {
+  int neQ = m_Q.size();
   for (int i = 0; i < neQ; ++i) {
-    snopt::integer var_index = m_Q[i].first - 1;
+    int var_index = m_Q[i].first - 1;
     (*varQval)[var_index] = m_Q[i].second;
   }
-  snopt::integer neb = m_b.size();
+  int neb = m_b.size();
   for (int i = 0; i < neb; ++i) {
-    snopt::integer var_index = m_b[i].first - 1;
+    int var_index = m_b[i].first - 1;
     (*varBval)[var_index] = m_b[i].second;
   }
 }

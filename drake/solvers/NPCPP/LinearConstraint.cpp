@@ -1,18 +1,18 @@
 #include "LinearConstraint.h"
 
 namespace drake {
-LinearConstraint::LinearConstraint(snopt::doublereal lb,
-    snopt::doublereal ub,
-    snopt::integer xdim,
-    std::vector<std::pair<snopt::integer, snopt::doublereal>> A_row) : Constraint(lb, ub, xdim) {
+LinearConstraint::LinearConstraint(double lb,
+    double ub,
+    int xdim,
+    std::vector<std::pair<int, double>> A_row) : Constraint(lb, ub, xdim) {
   m_A = A_row;
 }
 
-void LinearConstraint::nonlinearEval(snopt::doublereal x[],
+void LinearConstraint::nonlinearEval(double x[],
     bool needF,
     bool needG,
-    snopt::doublereal *f,
-    std::vector<snopt::doublereal> *g) const {
+    double *f,
+    std::vector<double> *g) const {
   // Do Nothing
 }
 } // namespace drake

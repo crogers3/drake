@@ -32,9 +32,9 @@ void NonlinearProgram::generateA(snopt::integer* lenA,
   *lenA = m_num_vars * (m_constraints.size() + 1);
 
   // Generate first row from cost's A
-  snopt::integer costNeA;
-  vector<snopt::integer> costJAvar;
-  vector<snopt::doublereal> costA;
+  int costNeA;
+  vector<int> costJAvar;
+  vector<double> costA;
   m_cost->getA(&costNeA, &costJAvar, &costA);
   for (int i = 0; i < costNeA; ++i) {
     (*neA)++;
@@ -47,9 +47,9 @@ void NonlinearProgram::generateA(snopt::integer* lenA,
   int num_constraints = m_constraints.size();
   for (int i = 0; i < num_constraints; ++i) {
     unique_ptr<Constraint> const& constr = m_constraints[i];
-    snopt::integer thisNeA;
-    vector<snopt::integer> thisJAvar;
-    vector<snopt::doublereal> thisA;
+    int thisNeA;
+    vector<int> thisJAvar;
+    vector<double> thisA;
     constr->getA(&thisNeA, &thisJAvar, &thisA);
     for (int j = 0; j < thisNeA; ++j) {
       (*neA)++;
@@ -67,8 +67,8 @@ void NonlinearProgram::generateG(snopt::integer* lenG,
   *lenG = m_num_vars * (m_constraints.size() + 1);
 
   // Generate first row from cost's G
-  snopt::integer costNeG;
-  vector<snopt::integer> costJGvar;
+  int costNeG;
+  vector<int> costJGvar;
   m_cost->getG(&costNeG, &costJGvar);
   for (int i = 0; i < costNeG; ++i) {
     (*neG)++;
@@ -80,8 +80,8 @@ void NonlinearProgram::generateG(snopt::integer* lenG,
   int num_constraints = m_constraints.size();
   for (int i = 0; i < num_constraints; ++i) {
     unique_ptr<Constraint> const& constr = m_constraints[i];
-    snopt::integer thisNeG;
-    vector<snopt::integer> thisJGvar;
+    int thisNeG;
+    vector<int> thisJGvar;
     constr->getG(&thisNeG, &thisJGvar);
     for (int j = 0; j < thisNeG; ++j) {
       (*neG)++;

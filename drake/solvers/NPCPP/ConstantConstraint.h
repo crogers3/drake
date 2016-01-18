@@ -3,10 +3,6 @@
 
 #include "BoundingBoxConstraint.h"
 
-namespace snopt {
-#include "snopt.hh"
-}
-
 namespace drake {
 /**
  * Enforces an equality constraint: x[jAvar] = desired_value
@@ -14,9 +10,9 @@ namespace drake {
  */
 class ConstantConstraint : public BoundingBoxConstraint {
 public:
-  ConstantConstraint(snopt::doublereal desired_value,
-    snopt::integer xdim,
-    snopt::integer jAvar);
+  ConstantConstraint(double desired_value,
+    int xdim,
+    int jAvar);
 };
 } // namespace drake
 

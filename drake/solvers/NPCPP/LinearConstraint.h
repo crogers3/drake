@@ -6,25 +6,21 @@
 
 #include "Constraint.h"
 
-namespace snopt {
-#include "snopt.hh"
-}
-
 namespace drake {
 /**
  * Linear constraint, where: lb <= A_row dot x <= ub
  */
 class LinearConstraint : public Constraint {
 public:
-  LinearConstraint(snopt::doublereal lb,
-    snopt::doublereal ub,
-    snopt::integer xdim,
-    std::vector<std::pair<snopt::integer, snopt::doublereal>> A_row);
-  void nonlinearEval(snopt::doublereal x[],
+  LinearConstraint(double lb,
+    double ub,
+    int xdim,
+    std::vector<std::pair<int, double>> A_row);
+  void nonlinearEval(double x[],
       bool needF,
       bool needG,
-      snopt::doublereal *f,
-      std::vector<snopt::doublereal> *g) const;
+      double *f,
+      std::vector<double> *g) const;
 };
 } // namespace drake
 

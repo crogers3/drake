@@ -4,10 +4,6 @@
 #include <utility>
 #include <vector>
 
-namespace snopt {
-#include "snopt.hh"
-}
-
 namespace drake {
 /**
  * Abstract constraint class.
@@ -20,22 +16,22 @@ namespace drake {
  */
 class Constraint {
 protected:
-  snopt::doublereal m_lb;
-  snopt::doublereal m_ub;
-  snopt::integer m_xdim;
-  std::vector<std::pair<snopt::integer, snopt::doublereal>> m_A;
-  std::vector<snopt::integer> m_jGvar;
+  double m_lb;
+  double m_ub;
+  int m_xdim;
+  std::vector<std::pair<int, double>> m_A;
+  std::vector<int> m_jGvar;
 
 public:
-  Constraint(snopt::doublereal lb, snopt::doublereal ub, snopt::integer xdim);
-  virtual void nonlinearEval(snopt::doublereal x[],
+  Constraint(double lb, double ub, int xdim);
+  virtual void nonlinearEval(double x[],
       bool needF,
       bool needG,
-      snopt::doublereal *f,
-      std::vector<snopt::doublereal> *g) const = 0;
-  void getBounds(snopt::doublereal* lb, snopt::doublereal* ub);
-  void getA(snopt::integer* neA, std::vector<snopt::integer>* jAvar, std::vector<snopt::doublereal>* A) const;
-  void getG(snopt::integer* neG, std::vector<snopt::integer>* jGvar) const;
+      double *f,
+      std::vector<double> *g) const = 0;
+  void getBounds(double* lb, double* ub);
+  void getA(int* neA, std::vector<int>* jAvar, std::vector<double>* A) const;
+  void getG(int* neG, std::vector<int>* jGvar) const;
 };
 } // namespace drake
 

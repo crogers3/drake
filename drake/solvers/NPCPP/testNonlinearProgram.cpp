@@ -30,12 +30,12 @@ void testNonlinearProgram_linearFunction() {
    *
    * Otherwise known as minimum of y = -x + 10, 1 <= x <= 9
    */
-  integer n = 2;
+  int n = 2;
   NonlinearProgram np(n);
 
   unique_ptr<Constraint> cost(new BoundingBoxConstraint(-INF, INF, n, 2));
 
-  vector<pair<integer, doublereal>> A_constr1(2);
+  vector<pair<int, double>> A_constr1(2);
   A_constr1[0] = make_pair(1, 1.0);
   A_constr1[1] = make_pair(2, 1.0);
   unique_ptr<Constraint> constr1(new LinearConstraint(10, 10, n, A_constr1));
@@ -65,14 +65,14 @@ void testNonlinearProgram_quadraticFunction() {
    * Otherwise known as minimum of y = x^2 -6x + 9
    */
    
-  integer n = 2;
+  int n = 2;
   NonlinearProgram np(n);
 
   unique_ptr<Constraint> cost(new BoundingBoxConstraint(-INF, INF, n, 2));
 
-  vector<pair<integer, doublereal>> Q_constr(1, make_pair(1, 1.0));
-  vector<pair<integer, doublereal>> b_constr(1, make_pair(1, -6.0));
-  vector<pair<integer, doublereal>> A_constr(1, make_pair(2, -1.0));
+  vector<pair<int, double>> Q_constr(1, make_pair(1, 1.0));
+  vector<pair<int, double>> b_constr(1, make_pair(1, -6.0));
+  vector<pair<int, double>> A_constr(1, make_pair(2, -1.0));
   unique_ptr<Constraint> constr(new QuadraticConstraint(
     -9.0, -9.0, n, Q_constr, b_constr, A_constr));
 
@@ -97,18 +97,18 @@ void testNonlinearProgram_exponentialFunction() {
    *
    *         Otherwise known as minimum of y = 4exp(x); -1 <= x <= 1
    */
-  integer n = 2;
+  int n = 2;
   NonlinearProgram np(n);
 
   unique_ptr<Constraint> cost(new BoundingBoxConstraint(-INF, INF, n, 2));
 
-  vector<pair<integer, doublereal>> A_constr1(1, make_pair(2, -1.0));
-  function<void(doublereal[],bool,bool,doublereal*,std::vector<doublereal>*)> fun_constr1;
-  fun_constr1 = [](doublereal x[],
+  vector<pair<int, double>> A_constr1(1, make_pair(2, -1.0));
+  function<void(double[],bool,bool,double*,std::vector<double>*)> fun_constr1;
+  fun_constr1 = [](double x[],
       bool needF,
       bool needG,
-      doublereal* f,
-      std::vector<doublereal>* g) -> void {
+      double* f,
+      std::vector<double>* g) -> void {
     if (needF) {
       *f = 4 * exp(x[0]);
     }
@@ -117,7 +117,7 @@ void testNonlinearProgram_exponentialFunction() {
       g->push_back(4 * exp(x[0]));
     }
   };
-  vector<integer> jGvar_constr1(1, 1);
+  vector<int> jGvar_constr1(1, 1);
   unique_ptr<Constraint> constr1(new FunctionHandleConstraint(0, 0, n, A_constr1, jGvar_constr1, fun_constr1));
 
   unique_ptr<Constraint> constr2(new BoundingBoxConstraint(-1, 1, n, 1));

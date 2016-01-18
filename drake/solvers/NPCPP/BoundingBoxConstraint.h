@@ -3,10 +3,6 @@
 
 #include "LinearConstraint.h"
 
-namespace snopt {
-#include "snopt.hh"
-}
-
 namespace drake {
 /**
  * Enforces a bounding box constraint: lb <= x[jAvar] <= ub
@@ -14,10 +10,10 @@ namespace drake {
  */
 class BoundingBoxConstraint : public LinearConstraint {
 public:
-  BoundingBoxConstraint(snopt::doublereal lb,
-      snopt::doublereal ub,
-      snopt::integer xdim,
-      snopt::integer jAvar);
+  BoundingBoxConstraint(double lb,
+      double ub,
+      int xdim,
+      int jAvar);
 };
 } // namespace drake
 
