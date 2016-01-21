@@ -79,11 +79,11 @@ int main(int argc, char* argv[]) {
   bool use_heightmap = true;
 
   if (use_heightmap) {
-    DrakeShapes::HeightMap geom("drake/examples/Cars/heightmaps/flat.png");
+    DrakeShapes::HeightMap geom("drake/examples/Cars/heightmaps/flat.png", 10.0);
     Isometry3d T_element_to_link = Isometry3d::Identity();
     auto & world = tree->bodies[0];
     Vector4d color;  color <<  0.9297, 0.7930, 0.6758, 1;  // was hex2dec({'ee','cb','ad'})'/256 in matlab
-    world->addVisualElement(DrakeShapes::VisualElement(geom,T_element_to_link,color));
+    //world->addVisualElement(DrakeShapes::VisualElement(geom,T_element_to_link,color));
     tree->addCollisionElement(RigidBody::CollisionElement(geom,T_element_to_link,world),world,"terrain");
     tree->updateStaticCollisionElements();
   } else { // add flat terrain

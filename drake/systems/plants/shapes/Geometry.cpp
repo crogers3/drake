@@ -1,6 +1,7 @@
 #include <fstream>
 
 #include "Geometry.h"
+#include "lodepng/lodepng.h"
 #include "spruce.hh"
 
 using namespace std;
@@ -291,13 +292,41 @@ namespace DrakeShapes
                    min_pos(2), max_pos(2), min_pos(2), max_pos(2), min_pos(2), max_pos(2), min_pos(2), max_pos(2);
   }
 
-  HeightMap::HeightMap(const string& filename)
-    : Geometry(HEIGHTMAP), filename(filename)
+  HeightMap::HeightMap(const string& filename, float scale)
+    : Geometry(HEIGHTMAP), filename(filename), scale(scale), has_heights(false)
   {}
 
-  bool HeightMap::extractHeights(Matrix3Xd& heights) const
+  bool HeightMap::parseImage() {
+    if (has_heights) {
+      return true;
+    }
+    vector<unsigned char> image;
+    unsigned width, length;
+    unsigned error = lodepng::decode(image, width, length, filename.c_str());
+    if (error) {
+      cerr << "Warning: Could not load HeightMap png: " + filename + ", error: " + lodepng_error_text(error) + "\n";
+      return false;
+    }
+    heights = Matrix<float, Dynamic, Dynamic, RowMajor>(length, width);
+    for (unsigned x = 0; x < width; ++x) {
+      for (unsigned y = 0; y < length; ++y) {
+        float height = image[4*y*width + 4*x];
+        height = (height / 255.0) * scale;
+        heights(y, x) = height;
+      }
+    }
+    has_heights = true;
+    return true;
+  }
+
+  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> const& HeightMap::getHeights()
   {
-    runtime_error("not implemented yet");
+    if (!has_heights) {
+      if (!parseImage()) {
+        runtime_error("Error: Could not parse HeightMap image: " + filename);
+      }
+    }
+    return heights;
   }
 
   HeightMap* HeightMap::clone() const

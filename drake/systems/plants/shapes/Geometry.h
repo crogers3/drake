@@ -1,6 +1,7 @@
 #ifndef __DrakeShapesGeometry_H__
 #define __DrakeShapesGeometry_H__
 
+#include <memory>
 #include <string>
 
 #include <Eigen/Dense>
@@ -128,14 +129,24 @@ namespace DrakeShapes
 
   class DRAKESHAPES_EXPORT HeightMap : public Geometry {
     public:
-      HeightMap(const std::string& filename);
+      HeightMap(const std::string& filename, float scale);
       virtual ~HeightMap() {}
       virtual HeightMap* clone() const;
       virtual void getPoints(Eigen::Matrix3Xd &points) const;
       virtual void getBoundingBoxPoints(Eigen::Matrix3Xd &points) const;
 
       std::string filename;
-      bool extractHeights(Eigen::Matrix3Xd& heights) const;
+      float scale;
+      // num_rows = length of heightmap
+      // num_cols = width of heightmap
+      Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> const& getHeights();
+
+    private:
+      bool parseImage();
+
+      Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> heights;
+      bool has_heights;
+      EIGEN_MAKE_ALIGNED_OPERATOR_NEW
   };
 
 }

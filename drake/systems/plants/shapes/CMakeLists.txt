@@ -1,4 +1,4 @@
-add_library_with_exports(LIB_NAME drakeShapes SOURCE_FILES Geometry.cpp Element.cpp VisualElement.cpp)
+add_library_with_exports(LIB_NAME drakeShapes SOURCE_FILES Geometry.cpp Element.cpp VisualElement.cpp lodepng/lodepng.cpp)
 target_link_libraries(drakeShapes spruce)
 
 #enable_testing()
