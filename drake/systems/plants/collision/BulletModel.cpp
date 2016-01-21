@@ -146,22 +146,6 @@ namespace DrakeCollision
     return bt_shape;
   }
 
-  unique_ptr<btCollisionShape> BulletModel::newBulletHeightMapShape(const DrakeShapes::HeightMap& geometry, bool use_margins)
-  {
-    height_maps.push_back(geometry);
-    DrakeShapes::HeightMap& stored_geometry = height_maps.back();
-    Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> const& heights = stored_geometry.getHeights();
-    unique_ptr<btCollisionShape> bt_shape(new btHeightfieldTerrainShape(
-      heights.cols(), heights.rows(), heights.data(), 1.0,
-      heights.minCoeff(), heights.maxCoeff(), 1, PHY_ScalarType::PHY_FLOAT, false));
-    if (use_margins) {
-      bt_shape->setMargin(BulletModel::large_margin);
-    } else {
-      bt_shape->setMargin(BulletModel::small_margin);
-    }
-    return bt_shape;
-  }
-
   ElementId BulletModel::addElement(const Element& element)
   {
     ElementId id =  Model::addElement(element);
@@ -210,13 +194,6 @@ namespace DrakeCollision
             const auto capsule = static_cast<const DrakeShapes::Capsule&>(elements[id]->getGeometry());
             bt_shape = newBulletCapsuleShape(capsule, true);
             bt_shape_no_margin = newBulletCapsuleShape(capsule, false);
-          }
-          break;
-        case DrakeShapes::HEIGHTMAP:
-          {
-            const auto heightmap = static_cast<const DrakeShapes::HeightMap&>(elements[id]->getGeometry());
-            bt_shape = newBulletHeightMapShape(heightmap, true);
-            bt_shape_no_margin = newBulletHeightMapShape(heightmap, false);
           }
           break;
         default:

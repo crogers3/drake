@@ -292,56 +292,31 @@ namespace DrakeShapes
                    min_pos(2), max_pos(2), min_pos(2), max_pos(2), min_pos(2), max_pos(2), min_pos(2), max_pos(2);
   }
 
-  HeightMap::HeightMap(const string& filename, float scale)
-    : Geometry(HEIGHTMAP), filename(filename), scale(scale), has_heights(false)
-  {}
+  unique_ptr<MeshPoints> MeshPoints::fromHeightMap(
+      const std::string& filename, double scale,
+      double xlow, double xhi, double ylow, double yhi) {
+    double width = xhi - xlow;
+    double length = yhi - ylow;
 
-  bool HeightMap::parseImage() {
-    if (has_heights) {
-      return true;
-    }
     vector<unsigned char> image;
-    unsigned width, length;
-    unsigned error = lodepng::decode(image, width, length, filename.c_str());
+    unsigned pic_width, pic_length;
+    unsigned error = lodepng::decode(image, pic_width, pic_length, filename.c_str());
     if (error) {
-      cerr << "Warning: Could not load HeightMap png: " + filename + ", error: " + lodepng_error_text(error) + "\n";
-      return false;
+      runtime_error("Warning: Could not load HeightMap png: " + filename + ", error: " + lodepng_error_text(error) + "\n");
     }
-    heights = Matrix<float, Dynamic, Dynamic, RowMajor>(length, width);
-    for (unsigned x = 0; x < width; ++x) {
-      for (unsigned y = 0; y < length; ++y) {
-        float height = image[4*y*width + 4*x];
+    Matrix3Xd points(3, pic_width * pic_length);
+    for (unsigned x = 0; x < pic_width; ++x) {
+      for (unsigned y = 0; y < pic_length; ++y) {
+        double x_adj = ((double(x) / (pic_width-1)) * width) + xlow;
+        double y_adj = ((double(y) / (pic_length-1)) * length) + ylow;
+        double height = image[4*y*pic_width + 4*x];
         height = (height / 255.0) * scale;
-        heights(y, x) = height;
+        points(0, x*pic_length + y) = x_adj;
+        points(1, x*pic_length + y) = y_adj;
+        points(2, x*pic_length + y) = height;
       }
     }
-    has_heights = true;
-    return true;
-  }
-
-  Eigen::Matrix<float, Eigen::Dynamic, Eigen::Dynamic, Eigen::RowMajor> const& HeightMap::getHeights()
-  {
-    if (!has_heights) {
-      if (!parseImage()) {
-        runtime_error("Error: Could not parse HeightMap image: " + filename);
-      }
-    }
-    return heights;
-  }
-
-  HeightMap* HeightMap::clone() const
-  {
-    return new HeightMap(*this);
-  }
-
-  void HeightMap::getPoints(Matrix3Xd& point_matrix) const
-  {
-    runtime_error("not implemented yet");
-  }
-
-  void HeightMap::getBoundingBoxPoints(Matrix3Xd& bbox_points) const
-  {
-    runtime_error("not implemented yet");
+    return unique_ptr<MeshPoints>(new MeshPoints(points));
   }
 
 }

@@ -5,7 +5,6 @@
 #include <BulletCollision/NarrowPhaseCollision/btGjkEpaPenetrationDepthSolver.h>
 #include <BulletCollision/NarrowPhaseCollision/btGjkPairDetector.h>
 #include <BulletCollision/NarrowPhaseCollision/btPointCollector.h>
-#include "BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h"
 
 #include "Element.h"
 #include "Model.h"
@@ -111,12 +110,8 @@ namespace DrakeCollision
     protected:
 
       BulletCollisionWorldWrapper& getBulletWorld(bool use_margins);
-      // Cannot be static since btHeightfieldTerrainShape does not take ownership of height data, so BulletModel must hold
-      // onto height data
-      std::unique_ptr<btCollisionShape> newBulletHeightMapShape(const DrakeShapes::HeightMap& geometry, bool use_margins);
 
       std::vector< std::unique_ptr<btCollisionShape> > bt_collision_shapes;
-      std::vector< DrakeShapes::HeightMap > height_maps;
       BulletCollisionWorldWrapper bullet_world;
       BulletCollisionWorldWrapper bullet_world_no_margin;
 
