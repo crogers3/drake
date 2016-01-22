@@ -1,5 +1,5 @@
 add_library_with_exports(LIB_NAME drakeShapes SOURCE_FILES Geometry.cpp Element.cpp VisualElement.cpp)
-target_link_libraries(drakeShapes spruce -lpng)
+target_link_libraries(drakeShapes spruce -lpng -lpthread)
 set_target_properties(drakeShapes PROPERTIES
   COMPILE_FLAGS "-Dcimg_display=0 -Dcimg_use_png"
 )
