@@ -1,7 +1,8 @@
 #include <fstream>
 
 #include "Geometry.h"
-#include "lodepng/lodepng.h"
+#define cimg_using_png
+#include "CImg.h"
 #include "spruce.hh"
 
 using namespace std;
@@ -300,17 +301,13 @@ namespace DrakeShapes
     if (has_heights) {
       return true;
     }
-    vector<unsigned char> image;
-    unsigned width, length;
-    unsigned error = lodepng::decode(image, width, length, filename.c_str());
-    if (error) {
-      cerr << "Warning: Could not load HeightMap png: " + filename + ", error: " + lodepng_error_text(error) + "\n";
-      return false;
-    }
-    heights = Matrix<float, Dynamic, Dynamic, RowMajor>(length, width);
-    for (unsigned x = 0; x < width; ++x) {
-      for (unsigned y = 0; y < length; ++y) {
-        float height = image[4*y*width + 4*x];
+    cimg_library::CImg<unsigned char> image(filename.c_str());
+    int pic_width = image.width();
+    int pic_length = image.height();
+    heights.resize(pic_length, pic_width);
+    for (int x = 0; x < pic_width; ++x) {
+      for (int y = 0; y < pic_length; ++y) {
+        float height = image.atXY(x, y, 0, 0);
         height = (height / 255.0) * scale;
         heights(y, x) = height;
       }
