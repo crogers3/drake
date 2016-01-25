@@ -36,6 +36,37 @@ namespace DrakeCollision
         bool in_collision;
   };
 
+  struct ClosestPointsContactResultCallback : public btCollisionWorld::ContactResultCallback
+  {
+  public:
+    ClosestPointsContactResultCallback() {
+      has_points = false;
+    }
+
+    bool hasPoints() {
+      return has_points;
+    }
+
+    virtual btScalar addSingleResult(
+        btManifoldPoint& cp,
+        const btCollisionObjectWrapper* colObj0Wrap,
+        int partId0,int index0,
+        const btCollisionObjectWrapper* colObj1Wrap,
+        int partId1,int index1) {
+      has_points = true;
+      point = cp;
+      return 0;
+    }
+
+    btManifoldPoint& getPoints() {
+      return point;
+    }
+
+  private:
+    bool has_points;
+    btManifoldPoint point;
+  };
+
   bool OverlapFilterCallback::needBroadphaseCollision(btBroadphaseProxy* proxy0,
       btBroadphaseProxy* proxy1) const
   {
@@ -441,6 +472,44 @@ namespace DrakeCollision
                          distance-radiusA-radiusB);
       return true;
     }
+    if (elements[idA]->getShape() == DrakeShapes::HEIGHTMAP || elements[idB]->getShape() == DrakeShapes::HEIGHTMAP) {
+      BulletCollisionWorldWrapper& bt_world = getBulletWorld(use_margins);
+
+      auto bt_objA_iter = bt_world.bt_collision_objects.find(idA);
+      if (bt_objA_iter == bt_world.bt_collision_objects.end())
+        return false;
+
+      auto bt_objB_iter = bt_world.bt_collision_objects.find(idB);
+      if (bt_objB_iter == bt_world.bt_collision_objects.end())
+        return false;
+
+      unique_ptr<btCollisionObject>& bt_objA = bt_objA_iter->second;
+      unique_ptr<btCollisionObject>& bt_objB = bt_objB_iter->second;
+
+      ClosestPointsContactResultCallback callback;
+      bt_world.bt_collision_world->contactPairTest(bt_objA.get(), bt_objB.get(), callback);
+
+      if (callback.hasPoints()) {
+        btManifoldPoint& cp = callback.getPoints();
+        btVector3 pointOnAinWorld = cp.getPositionWorldOnA();
+        btVector3 pointOnBinWorld = cp.getPositionWorldOnB();
+        btScalar distance = cp.getDistance();
+
+        btVector3 point_on_elemA = bt_objA->getWorldTransform().invXform(pointOnAinWorld);
+        btVector3 point_on_elemB = bt_objB->getWorldTransform().invXform(pointOnBinWorld);
+
+        auto point_on_A = elements[idA]->getLocalTransform() * toVector3d(point_on_elemA);
+        auto point_on_B = elements[idB]->getLocalTransform() * toVector3d(point_on_elemB);
+
+        c->addSingleResult(idA, idB, point_on_A, point_on_B, toVector3d(cp.m_normalWorldOnB), (double) distance);
+        return true;
+      } else {
+        //throw std::runtime_error("In BulletModel::findClosestPointsBtwElements: No closest point found between " + to_string(idA) + " and " + to_string(idB));
+        return false;
+      }
+      //return (c->pts.size() > 0);
+    }
+
 
     btConvexShape* shapeA;
     btConvexShape* shapeB;
@@ -467,7 +536,7 @@ namespace DrakeCollision
     btVoronoiSimplexSolver sGjkSimplexSolver;
     sGjkSimplexSolver.setEqualVertexThreshold(0.f);
 
-    btGjkPairDetector	convexConvex(shapeA,shapeB,&sGjkSimplexSolver,&epa);
+    btGjkPairDetector convexConvex(shapeA,shapeB,&sGjkSimplexSolver,&epa);
 
     input.m_transformA = bt_objA->getWorldTransform();
     input.m_transformB = bt_objB->getWorldTransform();
